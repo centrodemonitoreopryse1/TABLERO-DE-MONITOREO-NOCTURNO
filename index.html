@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero Consolidado — Novedades + SV · 15–16/09/2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0A1220; --panel:#101B31; --panel-2:#0D1728;
+    --border:#1E2D48; --border-soft:#16233B; --text:#E7EDF7; --text-muted:#8AA0C2; --text-dim:#566A8E;
+    --teal:#2AC9B8; --teal-soft:rgba(42,201,184,0.12); --amber:#F0A93E; --amber-soft:rgba(240,169,62,0.14);
+    --red:#F14C6B; --red-soft:rgba(241,76,107,0.14); --green:#33C077; --green-soft:rgba(51,192,119,0.13);
+    --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:radial-gradient(1100px 500px at 12% -10%,rgba(42,201,184,0.10),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(240,169,62,0.06),transparent 55%),var(--bg);color:var(--text);font-family:var(--body);line-height:1.5;padding:0 0 64px}
+  .masthead{border-bottom:1px solid var(--border-soft);padding:28px clamp(18px,4vw,56px) 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;position:relative}
+  .masthead::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal) 20%,var(--teal) 80%,transparent);opacity:.55}
+  .brand-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#157A6E);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:13px;color:#04201B}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)}
+  h1{font-family:var(--display);font-weight:600;font-size:clamp(22px,3.2vw,32px);margin:2px 0 6px}
+  .sub{color:var(--text-muted);font-size:14px;max-width:760px}
+  .status-pill{font-family:var(--mono);font-size:12.5px;display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);padding:9px 14px;border-radius:999px;color:var(--text-muted)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .wrap{padding:30px clamp(18px,4vw,56px) 0;max-width:1400px;margin:0 auto}
+  section{margin-bottom:40px}
+  .section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .section-num{font-family:var(--mono);color:var(--teal);font-size:12.5px}
+  .section-title{font-family:var(--display);font-size:19px;font-weight:600}
+  .section-note{color:var(--text-dim);font-size:12.5px;margin-left:auto;font-family:var(--mono)}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--border);border-radius:14px;padding:16px}
+  .kpi .label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
+  .kpi .num{font-family:var(--display);font-size:28px;font-weight:600;margin-top:6px}
+  .kpi .foot{font-size:11.5px;color:var(--text-muted);margin-top:4px}
+  .kpi.t .num{color:var(--teal)}.kpi.g .num{color:var(--green)}.kpi.a .num{color:var(--amber)}.kpi.r .num{color:var(--red)}
+  .timeline-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px clamp(14px,3vw,26px) 18px}
+  .timeline-legend{display:flex;gap:18px;margin-bottom:14px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);font-family:var(--mono)}
+  .legend-item{display:flex;align-items:center;gap:7px}
+  .legend-swatch{width:9px;height:9px;border-radius:2px}
+  .timeline-axis{position:relative;height:96px}
+  .timeline-line{position:absolute;left:0;right:0;top:48px;height:1px;background:var(--border)}
+  .timeline-hourmarks{position:absolute;left:0;right:0;top:64px;height:20px}
+  .hm{position:absolute;transform:translateX(-50%);font-family:var(--mono);font-size:10.5px;color:var(--text-dim)}
+  .hm::before{content:"";position:absolute;left:50%;top:-16px;width:1px;height:8px;background:var(--border-soft)}
+  .tpoint{position:absolute;top:38px;width:13px;height:13px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--bg);cursor:default}
+  .tpoint.ok{background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .tpoint .tip{visibility:hidden;opacity:0;position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:#050B15;border:1px solid var(--border);color:var(--text);font-size:11px;font-family:var(--mono);padding:6px 9px;border-radius:8px;white-space:nowrap;z-index:5;transition:opacity .15s}
+  .tpoint:hover .tip{visibility:visible;opacity:1}
+  .table-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead th{text-align:left;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);padding:12px 14px;border-bottom:1px solid var(--border);background:var(--panel-2)}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--border-soft);color:var(--text);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,0.02)}
+  td.num,th.num{font-family:var(--mono);text-align:right}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-family:var(--mono);font-size:11px;white-space:nowrap}
+  .badge.ok{background:var(--green-soft);color:var(--green)}
+  .badge.dev{background:var(--red-soft);color:var(--red)}
+  .badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .muted{color:var(--text-muted)}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:980px){.two-col,.three-col{grid-template-columns:1fr}}
+  .hito-item{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--amber)}
+  .hito-item .title{font-family:var(--display);font-weight:600;font-size:14px}
+  .hito-item .meta{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+  .hito-item .loc{font-size:12px;color:var(--text-muted);margin:4px 0}
+  .hito-item .note{font-size:12.5px;color:var(--text-muted)}
+  .info-box{border:1px solid var(--border);border-left:3px solid var(--red);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:var(--panel);font-size:13.5px;color:var(--text-muted)}
+  .reg-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+  @media(max-width:980px){.reg-grid{grid-template-columns:1fr}}
+  .reg-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .reg-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat-box{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:10px;padding:12px 14px}
+  .stat-box .k{font-family:var(--mono);font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em}
+  .stat-box .v{font-family:var(--display);font-size:20px;font-weight:600;margin-top:4px}
+  .chart-wrap{height:240px;margin-top:8px}
+  .reg-notes{font-size:13px;color:var(--text-muted);margin-top:14px;padding-left:18px}
+  .reg-notes li{margin-bottom:8px}
+  .err-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:6px 0}
+  .err-item{display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-soft);font-size:13.5px;color:var(--text-muted)}
+  .err-item:last-child{border-bottom:none}
+  .err-icon{font-family:var(--mono);color:var(--amber);flex-shrink:0;font-size:12px;margin-top:2px}
+  footer{max-width:1400px;margin:40px auto 0;padding:20px clamp(18px,4vw,56px) 0;border-top:1px solid var(--border-soft);color:var(--text-dim);font-size:12px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div>
+    <div class="brand-row">
+      <div class="brand-mark">CE</div>
+      <span class="eyebrow">Centro de Enlace · Bitácora consolidada</span>
+    </div>
+    <h1>Tablero consolidado — Novedades + SV · 15–16/09/2026</h1>
+    <div class="sub">Une cierres matutino/vespertino por OOAD, supervisiones virtuales nocturnas, monitoreo de turno, hitos operativos y análisis de secuencia SV.</div>
+  </div>
+  <div class="status-pill"><span class="dot"></span> 14 estados · 0 FT · 16 SV · 12/14 con cobertura SV</div>
+</div>
+<div class="wrap">
+
+<section>
+  <div class="kpis" id="kpiGrid"></div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <span class="section-title">Línea de tiempo — matutinos 16/09</span>
+    <span class="section-note">05:00 – 07:00 · todos a tiempo</span>
+  </div>
+  <div class="timeline-card">
+    <div class="timeline-legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span> Reportado completo</div>
+    </div>
+    <div class="timeline-axis" id="timelineAxis"></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <span class="section-title">Estatus por Estado / OOAD</span>
+    <span class="section-note">Vespertino 15 · Matutino 16 · SV periodo</span>
+  </div>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Estado / OOAD</th><th>Coordinador</th>
+          <th class="num">Vesp. 15</th><th class="num">Mat. 16</th>
+          <th class="num">SV</th><th>Estatus</th>
+        </tr>
+      </thead>
+      <tbody id="ooadBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <span class="section-title">Desviaciones · hitos novedades · hitos SV</span>
+  </div>
+  <div class="three-col">
+    <div>
+      <div class="section-title" style="font-size:14px;color:var(--red);margin-bottom:10px;">Omisiones / desviaciones</div>
+      <div id="devBox"></div>
+    </div>
+    <div>
+      <div class="section-title" style="font-size:14px;color:var(--amber);margin-bottom:10px;">Hitos de novedades</div>
+      <div id="hitoNov"></div>
+    </div>
+    <div>
+      <div class="section-title" style="font-size:14px;color:var(--teal);margin-bottom:10px;">Hitos SV / monitoreo</div>
+      <div id="hitoSv"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <span class="section-title">Detalle supervisiones virtuales</span>
+    <span class="section-note">16 SV · Israel + Kevin</span>
+  </div>
+  <div class="table-card" style="max-height:380px;overflow-y:auto">
+    <table>
+      <thead><tr><th>Folio</th><th>Estado</th><th>Unidad</th><th>Fecha</th><th>Hora</th><th>Operador</th></tr></thead>
+      <tbody id="svBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">05</span>
+    <span class="section-title">Regresión — secuencia ronda Kevin (SV)</span>
+    <span class="section-note">Orden vs. minutos desde 22:00</span>
+  </div>
+  <div class="reg-grid">
+    <div class="reg-card"><div class="chart-wrap"><canvas id="regChart"></canvas></div></div>
+    <div class="reg-card">
+      <div class="reg-stats" id="regStats"></div>
+      <ul class="reg-notes" id="regNotes"></ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">06</span>
+    <span class="section-title">Errores e inconsistencias (fuentes unidas)</span>
+  </div>
+  <div class="err-card" id="errList"></div>
+</section>
+
+</div>
+<footer>
+  <span>Fuentes: tabla 15 AL 16 SEP 2026.xlsx + TABLA MONITOREO 15 Y 16.xlsx</span>
+  <span>Tablero consolidado · 15–16/09/2026</span>
+</footer>
+<script>
+const D = {"meta": {"fecha": "15–16/09/2026", "novedades_registros": 47, "sv_registros": 19, "completo_nov": 47, "completo_sv": 19, "fuera": 0, "sin_mat": 0, "estados": 14, "sv_count": 16, "sv_cubiertos": 12, "sv_faltantes": 2, "dia15": 21, "dia16": 26}, "ooad_summary": [{"ooad": "AGUASCALIENTES", "coord": "RICARDO NANDI", "ves": "18:09", "mat": "06:36", "sv": 1, "estatus": "OK"}, {"ooad": "BAJA CALIFORNIA", "coord": "EDGAR ACOSTA ESCARCEGA", "ves": "17:02", "mat": "05:42", "sv": 1, "estatus": "OK"}, {"ooad": "BAJA CALIFORNIA SUR", "coord": "LEONCIO CORONADO GALINDO", "ves": "17:06", "mat": "05:00", "sv": 2, "estatus": "OK"}, {"ooad": "CHIHUAHUA", "coord": "HECTOR GABRIEL BOLLY", "ves": "18:00", "mat": "06:12", "sv": 2, "estatus": "OK"}, {"ooad": "COAHUILA", "coord": "CESAR FRANCISCO CEDILLO PEREZ", "ves": "18:00", "mat": "06:26", "sv": 1, "estatus": "OK"}, {"ooad": "DURANGO", "coord": "HECTOR ALFONSO LUJAN FLORIANO", "ves": "18:09", "mat": "06:26", "sv": 0, "estatus": "SIN SV"}, {"ooad": "JALISCO", "coord": "MARIO ALBERTO FLORES ALEISSA", "ves": "18:16", "mat": "06:03", "sv": 1, "estatus": "OK"}, {"ooad": "NAYARIT", "coord": "AARON RICARDO PALMA ROMAN", "ves": "18:02", "mat": "06:27", "sv": 1, "estatus": "OK"}, {"ooad": "NUEVO LEÓN", "coord": "JOSE ANTONIO RAMOS AGUILAR", "ves": "18:01", "mat": "06:16", "sv": 0, "estatus": "SIN SV"}, {"ooad": "SAN LUIS POTOSÍ", "coord": "ADRIAN LEYVA", "ves": "18:41", "mat": "06:25", "sv": 1, "estatus": "OK"}, {"ooad": "SINALOA", "coord": "RAUL GALLARDO VELÀZQUEZ", "ves": "17:02", "mat": "05:00", "sv": 1, "estatus": "OK"}, {"ooad": "SONORA", "coord": "GUSTAVO ALONSO RASCON EVANS", "ves": "17:04", "mat": "05:05", "sv": 2, "estatus": "OK"}, {"ooad": "TAMAULIPAS", "coord": "RONALD HERNANDEZ", "ves": "18:41", "mat": "06:19", "sv": 1, "estatus": "OK"}, {"ooad": "ZACATECAS", "coord": "EDUARDO AYALA LOPEZ", "ves": "18:03", "mat": "06:00", "sv": 2, "estatus": "OK"}], "hitos_nov": [{"folio": 4290, "ooad": "SINALOA", "unidad": "HGR#1 · CULIACAN", "inc": "ALTA DE CODIGO PLATA", "hora": "12:00", "fecha": "15/09", "obs": "Alta paciente herida arma de fuego; sale en carro particular"}, {"folio": 4291, "ooad": "IMSS CENTRALES", "unidad": "CECOE", "inc": "INSTRUCCIONES A TRABAJAR", "hora": "17:31", "fecha": "15/09", "obs": "Seguridad activa: extorsión, intrusión, vandalismo, detonaciones, alcohol"}, {"folio": 4320, "ooad": "IMSS CENTRALES", "unidad": "CECOE", "inc": "ORDEN DE DIA", "hora": "05:12", "fecha": "16/09", "obs": "Orden del día y decálogo de trato digno"}, {"folio": 4336, "ooad": "SONORA", "unidad": "CSS · HUATABAMPO", "inc": "FILTRACIONES DE AGUA POR LLUVIAS", "hora": "07:20", "fecha": "16/09", "obs": "Filtraciones por fuertes lluvias en diferentes áreas de la unidad"}], "hitos_sv": [{"titulo": "Ronda Israel (madrugada 15)", "detalle": "3 SV (Zacatecas, BCS, Sonora) + monitoreo 06:01 — sin novedad"}, {"titulo": "Ronda Kevin (noche 15→16)", "detalle": "13 SV de 22:30 a 02:48 + monitoreo 22:00 y 06:41"}, {"titulo": "Cobertura SV incompleta", "detalle": "Durango y Nuevo León sin ninguna SV en el periodo"}], "sv_rows": [{"folio": 4271, "estado": "ZACATECAS", "unidad": "UMF#58", "fecha": "15/09", "hora": "00:03", "op": "Israel"}, {"folio": 4272, "estado": "BCS", "unidad": "OFICINAS TECNICAS", "fecha": "15/09", "hora": "00:14", "op": "Israel"}, {"folio": 4273, "estado": "SONORA", "unidad": "HGZ#2", "fecha": "15/09", "hora": "00:33", "op": "Israel"}, {"folio": 4307, "estado": "CHIHUAHUA", "unidad": "UMF#8", "fecha": "15/09", "hora": "22:30", "op": "Kevin"}, {"folio": 4308, "estado": "NAYARIT", "unidad": "HGZ#1", "fecha": "15/09", "hora": "22:57", "op": "Kevin"}, {"folio": 4309, "estado": "SINALOA", "unidad": "UMF#4", "fecha": "15/09", "hora": "23:22", "op": "Kevin"}, {"folio": 4310, "estado": "SLP", "unidad": "HGZ#1", "fecha": "15/09", "hora": "23:35", "op": "Kevin"}, {"folio": 4311, "estado": "COAHUILA", "unidad": "UMF#60", "fecha": "16/09", "hora": "00:03", "op": "Kevin"}, {"folio": 4312, "estado": "BCS", "unidad": "UMF#8", "fecha": "16/09", "hora": "00:23", "op": "Kevin"}, {"folio": 4313, "estado": "SONORA", "unidad": "HGZ#16", "fecha": "16/09", "hora": "00:48", "op": "Kevin"}, {"folio": 4314, "estado": "AGS", "unidad": "HGZ#2", "fecha": "16/09", "hora": "01:10", "op": "Kevin"}, {"folio": 4315, "estado": "BC", "unidad": "HGO#7", "fecha": "16/09", "hora": "01:19", "op": "Kevin"}, {"folio": 4316, "estado": "ZACATECAS", "unidad": "HR#51", "fecha": "16/09", "hora": "01:34", "op": "Kevin"}, {"folio": 4317, "estado": "CHIHUAHUA", "unidad": "UMF#1", "fecha": "16/09", "hora": "02:02", "op": "Kevin"}, {"folio": 4318, "estado": "JALISCO", "unidad": "HGR#45", "fecha": "16/09", "hora": "02:25", "op": "Kevin"}, {"folio": 4319, "estado": "TAMAULIPAS", "unidad": "HGR#6", "fecha": "16/09", "hora": "02:48", "op": "Kevin"}], "mat_points": [{"ooad": "BCS", "hora": "05:00", "min": 300}, {"ooad": "SINALOA", "hora": "05:00", "min": 300}, {"ooad": "SONORA", "hora": "05:05", "min": 305}, {"ooad": "BC", "hora": "05:42", "min": 342}, {"ooad": "ZACATECAS", "hora": "06:00", "min": 360}, {"ooad": "JALISCO", "hora": "06:03", "min": 363}, {"ooad": "CHIHUAHUA", "hora": "06:12", "min": 372}, {"ooad": "NL", "hora": "06:16", "min": 376}, {"ooad": "TAMAULIPAS", "hora": "06:19", "min": 379}, {"ooad": "SLP", "hora": "06:25", "min": 385}, {"ooad": "COAHUILA", "hora": "06:26", "min": 386}, {"ooad": "DURANGO", "hora": "06:26", "min": 386}, {"ooad": "NAYARIT", "hora": "06:27", "min": 387}, {"ooad": "AGS", "hora": "06:36", "min": 396}], "reg_sv": {"n": 13, "r": 0.998, "slope": 20.8, "mean_int": 21.5}, "errores": ["SLA casi vacío en novedades (2/47) y vacío en las 19 filas de monitoreo/SV.", "Observaciones SV ronda Kevin: texto plantilla idéntico (“5 códigos plata en permanencia”) en los 13 estados.", "Ronda Israel: observación uniforme “sin novedad al momento”.", "Durango y Nuevo León sin ninguna supervisión virtual en el periodo.", "Coordinador Aguascalientes: “RICARDO NANDI” (antes capturado como NORI).", "Nombre “RAUL GALLARDO VELÀZQUEZ” (acento grave); typo “FILTACIONES”.", "Municipios SV sin estandarizar: BJ CALIFORNIA SUR, VILLAREAL, CD MADERO.", "Cero FUERA DE TIEMPO formal en novedades y en SV/monitoreo. 14/14 estados con vespertino y matutino.", "Regresión de retraso matutino no estimable (0 casos FT). Regresión de secuencia SV Kevin: r≈0.998, ~21 min entre llamadas."]};
+</script>
+<script>
+const m = D.meta;
+document.getElementById('kpiGrid').innerHTML = [
+  {l:'Novedades', v:m.novedades_registros, f:`${m.dia15} el 15 · ${m.dia16} el 16`, c:'t'},
+  {l:'SV + monitoreo', v:m.sv_registros, f:`${m.sv_count} SV · 3 mon.`, c:'a'},
+  {l:'Fuera de tiempo', v:0, f:'ningún FT formal', c:'g'},
+  {l:'Estados mat/ves', v:'14/14', f:'cobertura completa', c:'g'},
+  {l:'Estados con SV', v:m.sv_cubiertos, f:'de 14 OOAD', c:'a'},
+  {l:'Sin SV', v:m.sv_faltantes, f:'Durango, NL', c:'r'},
+].map(k=>`<div class="kpi ${k.c}"><div class="label">${k.l}</div><div class="num">${k.v}</div><div class="foot">${k.f}</div></div>`).join('');
+
+// Timeline
+const axis = document.getElementById('timelineAxis');
+const minStart=300, minEnd=420;
+let hm='';
+for(let h=5;h<=7;h++){const pct=((h*60)-minStart)/(minEnd-minStart)*100;hm+=`<div class="hm" style="left:${pct}%">${String(h).padStart(2,'0')}:00</div>`;}
+axis.innerHTML=`<div class="timeline-line"></div><div class="timeline-hourmarks">${hm}</div>`;
+D.mat_points.forEach(p=>{
+  const pct=Math.min(100,Math.max(0,(p.min-minStart)/(minEnd-minStart)*100));
+  const el=document.createElement('div');
+  el.className='tpoint ok'; el.style.left=pct+'%';
+  el.innerHTML=`<div class="tip">${p.ooad} · ${p.hora}</div>`;
+  axis.appendChild(el);
+});
+
+// OOAD table
+const sorted=[...D.ooad_summary].sort((a,b)=>(a.sv===0?0:1)-(b.sv===0?0:1)||a.ooad.localeCompare(b.ooad));
+document.getElementById('ooadBody').innerHTML=sorted.map(o=>{
+  const badge=o.sv>0?'<span class="badge ok"><span class="badge-dot"></span>OK</span>':'<span class="badge dev"><span class="badge-dot"></span>Sin SV</span>';
+  return `<tr>
+    <td style="font-family:var(--display);font-weight:600">${o.ooad}</td>
+    <td class="muted">${o.coord}</td>
+    <td class="num">${o.ves}</td><td class="num">${o.mat}</td>
+    <td class="num" style="color:${o.sv?'var(--text)':'var(--red)'}">${o.sv}</td>
+    <td>${badge}</td></tr>`;
+}).join('');
+
+document.getElementById('devBox').innerHTML=`
+  <div class="info-box"><b style="color:var(--red)">Durango</b> — sin supervisión virtual en el periodo (sí tiene vespertino y matutino a tiempo).</div>
+  <div class="info-box"><b style="color:var(--red)">Nuevo León</b> — sin supervisión virtual en el periodo (sí tiene vespertino y matutino a tiempo).</div>
+  <div class="info-box" style="border-left-color:var(--green)"><b style="color:var(--green)">0 FUERA DE TIEMPO</b> en reportes matutino/vespertino y en SV/monitoreo.</div>`;
+
+document.getElementById('hitoNov').innerHTML=D.hitos_nov.map(h=>`
+  <div class="hito-item">
+    <div class="title">${h.inc}</div>
+    <div class="meta">${h.hora} · ${h.fecha} · F${h.folio}</div>
+    <div class="loc">${h.ooad} · ${h.unidad}</div>
+    <div class="note">${h.obs}</div>
+  </div>`).join('');
+
+document.getElementById('hitoSv').innerHTML=D.hitos_sv.map(h=>`
+  <div class="hito-item" style="border-left-color:var(--teal)">
+    <div class="title">${h.titulo}</div>
+    <div class="note">${h.detalle}</div>
+  </div>`).join('');
+
+document.getElementById('svBody').innerHTML=D.sv_rows.map(s=>`<tr>
+  <td class="num">${s.folio}</td>
+  <td style="font-weight:600">${s.estado}</td>
+  <td class="muted">${s.unidad}</td>
+  <td>${s.fecha}</td>
+  <td style="font-family:var(--mono)">${s.hora}</td>
+  <td class="muted">${s.op}</td>
+</tr>`).join('');
+
+const reg=D.reg_sv;
+document.getElementById('regStats').innerHTML=`
+  <div class="stat-box"><div class="k">N SV Kevin</div><div class="v">${reg.n}</div></div>
+  <div class="stat-box"><div class="k">Correlación r</div><div class="v">${reg.r}</div></div>
+  <div class="stat-box"><div class="k">Pendiente</div><div class="v">${reg.slope} min</div></div>
+  <div class="stat-box"><div class="k">Intervalo medio</div><div class="v">${reg.mean_int} min</div></div>`;
+document.getElementById('regNotes').innerHTML=`
+  <li>Regresión del <b>orden de llamada</b> (1…${reg.n}) vs. minutos desde las 22:00 del 15/09.</li>
+  <li>r ≈ ${reg.r}: cadencia casi perfectamente lineal en la ronda nocturna de Kevin.</li>
+  <li>≈ <b>${reg.slope} min</b> entre SV consecutivas (media observada ${reg.mean_int} min).</li>
+  <li>Matutinos 16/09: 0 casos FT (n=14); regresión de retraso no estimable.</li>
+  <li>Vespertino 15/09: 14/14 estados entre 17:02 y 18:41, todos completos.</li>`;
+
+// Chart Kevin sequence
+const kevin=D.sv_rows.filter(s=>s.op==='Kevin');
+function nightMin(fecha,hora){
+  const [hh,mm]=hora.split(':').map(Number); const mins=hh*60+mm;
+  return fecha.startsWith('15') ? mins-22*60 : (24*60-22*60)+mins;
+}
+const labels=kevin.map((_,i)=>String(i+1));
+const times=kevin.map(s=>nightMin(s.fecha,s.hora));
+const fitted=times.map((_,i)=>15.69+20.79*(i+1));
+new Chart(document.getElementById('regChart'),{
+  type:'line',
+  data:{labels,datasets:[
+    {label:'Min desde 22:00',data:times,borderColor:'#2AC9B8',pointBackgroundColor:'#2AC9B8',pointRadius:5,borderWidth:2,fill:false,tension:.15},
+    {label:'Ajuste lineal',data:fitted,borderColor:'#F0A93E',borderDash:[6,4],pointRadius:0,borderWidth:2,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#8AA0C2',font:{family:'Inter',size:11}}},
+      tooltip:{backgroundColor:'#0D1728',borderColor:'#1E2D48',borderWidth:1,titleColor:'#E7EDF7',bodyColor:'#8AA0C2'}},
+    scales:{
+      x:{title:{display:true,text:'Orden SV',color:'#566A8E'},ticks:{color:'#566A8E',font:{family:'IBM Plex Mono',size:10}},grid:{color:'#16233B'}},
+      y:{title:{display:true,text:'Min desde 22:00',color:'#566A8E'},ticks:{color:'#566A8E',font:{family:'IBM Plex Mono',size:10}},grid:{color:'#16233B'}}
+    }}
+});
+
+document.getElementById('errList').innerHTML=D.errores.map(e=>
+  `<div class="err-item"><span class="err-icon">▲</span><span>${e}</span></div>`).join('');
+</script>
+</body>
+</html>
