@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero Unificado — Guardia + SV 16–17/09/2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg: #0A1220; --panel: #101B31; --panel-2: #0D1728;
+    --border: #1E2D48; --border-soft: #16233B; --text: #E7EDF7; --text-muted: #8AA0C2; --text-dim: #566A8E;
+    --teal: #2AC9B8; --teal-soft: rgba(42,201,184,0.12); --amber: #F0A93E; --amber-soft: rgba(240,169,62,0.14);
+    --red: #F14C6B; --red-soft: rgba(241,76,107,0.14); --green: #33C077; --green-soft: rgba(51,192,119,0.13);
+    --display: 'Space Grotesk', sans-serif; --body: 'Inter', sans-serif; --mono: 'IBM Plex Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      radial-gradient(1100px 500px at 12% -10%, rgba(42,201,184,0.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(240,169,62,0.06), transparent 55%),
+      var(--bg);
+    color: var(--text); font-family: var(--body); line-height: 1.5; padding: 0 0 64px 0;
+  }
+  ::selection{ background: var(--teal); color:#062420; }
+  .masthead{
+    border-bottom: 1px solid var(--border-soft);
+    padding: 28px clamp(18px, 4vw, 56px) 22px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap: 24px; flex-wrap: wrap; position: relative;
+  }
+  .masthead::before{
+    content:""; position:absolute; left:0; right:0; top:0; height:2px;
+    background: linear-gradient(90deg, transparent, var(--teal) 20%, var(--teal) 80%, transparent); opacity:0.55;
+  }
+  .brand-row{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background: linear-gradient(135deg, var(--teal), #157A6E);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--mono); font-weight:600; font-size:13px; color:#04201B; flex-shrink:0;
+  }
+  .eyebrow{ font-family: var(--mono); font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-dim); }
+  h1{ font-family: var(--display); font-weight:600; font-size: clamp(22px, 3.2vw, 32px); margin: 2px 0 6px; letter-spacing:-0.01em; }
+  .sub{ color: var(--text-muted); font-size:14px; max-width: 760px; }
+  .status-pill{
+    font-family: var(--mono); font-size:12.5px; letter-spacing:.03em;
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--panel); border:1px solid var(--border); padding: 9px 14px; border-radius: 999px; color: var(--text-muted);
+  }
+  .dot{ width:8px; height:8px; border-radius:50%; background: var(--green); box-shadow:0 0 0 3px var(--green-soft); }
+  .wrap{ padding: 30px clamp(18px, 4vw, 56px) 0; max-width: 1360px; margin:0 auto; }
+  section{ margin-bottom: 40px; }
+  .section-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .section-num{ font-family: var(--mono); color: var(--teal); font-size:12.5px; }
+  .section-title{ font-family: var(--display); font-size:19px; font-weight:600; }
+  .section-note{ color: var(--text-dim); font-size:12.5px; margin-left:auto; font-family: var(--mono); }
+  .kpis{ display:grid; grid-template-columns: repeat(6, 1fr); gap:12px; }
+  @media (max-width: 1100px){ .kpis{ grid-template-columns: repeat(3,1fr);} }
+  @media (max-width: 640px){ .kpis{ grid-template-columns: repeat(2,1fr);} }
+  .kpi{
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--border); border-radius:14px; padding:16px;
+  }
+  .kpi .label{ font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-family: var(--mono); }
+  .kpi .num{ font-family: var(--display); font-size: 28px; font-weight:600; margin-top:6px; }
+  .kpi .foot{ font-size:11.5px; color: var(--text-muted); margin-top:4px; }
+  .kpi.accent-red .num{ color: var(--red); }
+  .kpi.accent-amber .num{ color: var(--amber); }
+  .kpi.accent-green .num{ color: var(--green); }
+  .kpi.accent-teal .num{ color: var(--teal); }
+  .timeline-card{ background: var(--panel); border:1px solid var(--border); border-radius:14px; padding: 22px clamp(14px,3vw,26px) 18px; }
+  .timeline-legend{ display:flex; gap:18px; margin-bottom:14px; flex-wrap:wrap; font-size:12px; color:var(--text-muted); font-family: var(--mono);}
+  .legend-item{ display:flex; align-items:center; gap:7px; }
+  .legend-swatch{ width:9px; height:9px; border-radius:2px; }
+  .timeline-axis{ position:relative; height: 96px; }
+  .timeline-line{ position:absolute; left:0; right:0; top:48px; height:1px; background: var(--border); }
+  .timeline-hourmarks{ position:absolute; left:0; right:0; top:64px; height:20px; }
+  .hm{ position:absolute; transform: translateX(-50%); font-family: var(--mono); font-size:10.5px; color: var(--text-dim); }
+  .hm::before{ content:""; position:absolute; left:50%; top:-16px; width:1px; height:8px; background:var(--border-soft); }
+  .tpoint{ position:absolute; top:38px; width:13px; height:13px; border-radius:50%; transform: translateX(-50%); border: 2px solid var(--bg); cursor: default; }
+  .tpoint.ok{ background: var(--green); box-shadow:0 0 0 3px var(--green-soft); }
+  .tpoint .tip{
+    visibility:hidden; opacity:0; position:absolute; bottom:22px; left:50%; transform: translateX(-50%);
+    background:#050B15; border:1px solid var(--border); color:var(--text); font-size:11px;
+    font-family: var(--mono); padding:6px 9px; border-radius:8px; white-space:nowrap; z-index:5; transition: opacity .15s ease;
+  }
+  .tpoint:hover .tip{ visibility:visible; opacity:1; }
+  .table-card{ background: var(--panel); border:1px solid var(--border); border-radius:14px; overflow:hidden; overflow-x:auto; }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  thead th{
+    text-align:left; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    color: var(--text-dim); padding:13px 14px; border-bottom:1px solid var(--border); background: var(--panel-2);
+  }
+  tbody td{ padding:11px 14px; border-bottom:1px solid var(--border-soft); color: var(--text); vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background: rgba(255,255,255,0.02); }
+  td.num, th.num{ font-family: var(--mono); text-align:right; }
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-family: var(--mono); font-size:11px; white-space:nowrap; }
+  .badge.ok{ background: var(--green-soft); color: var(--green); }
+  .badge.miss{ background: var(--red-soft); color: var(--red); }
+  .badge-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .muted{ color: var(--text-muted); }
+  .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items:start; }
+  .three-col{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items:start; }
+  @media (max-width: 980px){ .two-col, .three-col{ grid-template-columns:1fr; } }
+  .empty-box, .info-box{
+    border:1px dashed var(--border); border-radius:10px; padding:16px; color: var(--text-dim);
+    font-size:13.5px; background: var(--panel);
+  }
+  .info-box{ border-style:solid; border-left: 3px solid var(--amber); }
+  .miss-item{
+    border:1px solid var(--border); border-left: 3px solid var(--red);
+    background: var(--panel); border-radius:10px; padding:12px 14px; margin-bottom:10px;
+    font-family: var(--display); font-weight:600;
+  }
+  .hito-item{ border:1px solid var(--border); background: var(--panel); border-radius:10px; padding:14px 16px; margin-bottom:12px; border-left: 3px solid var(--amber); }
+  .hito-item .row1{ display:flex; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+  .hito-item .title{ font-family: var(--display); font-weight:600; font-size:14px; }
+  .hito-item .meta{ font-family: var(--mono); font-size:11px; color: var(--text-dim); white-space:nowrap; }
+  .hito-item .loc{ font-size:12px; color: var(--text-muted); margin-bottom:5px; }
+  .hito-item .note{ font-size:12.5px; color: var(--text-muted); }
+  .sv-item{
+    border:1px solid var(--border-soft); background: var(--panel-2); border-radius:8px;
+    padding:10px 14px; margin-bottom:8px; font-size:12.5px; color: var(--text-muted);
+    display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .sv-item .u{ color: var(--text); font-family: var(--display); font-weight:600; font-size:13px; }
+  .reg-grid{ display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
+  @media (max-width: 980px){ .reg-grid{ grid-template-columns:1fr; } }
+  .reg-card{ background: var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px; }
+  .reg-stats{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat-box{ background: var(--panel-2); border:1px solid var(--border-soft); border-radius:10px; padding:12px 14px; }
+  .stat-box .k{ font-family: var(--mono); font-size:10.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; }
+  .stat-box .v{ font-family: var(--display); font-size:20px; font-weight:600; margin-top:4px; }
+  .chart-wrap{ height: 240px; margin-top: 8px; }
+  .reg-notes{ font-size:13px; color: var(--text-muted); margin-top:14px; padding-left:18px; }
+  .reg-notes li{ margin-bottom:8px; }
+  .err-card{ background: var(--panel); border:1px solid var(--border); border-radius:14px; padding: 6px 0; }
+  .err-item{ display:flex; gap:12px; padding: 13px 20px; border-bottom:1px solid var(--border-soft); font-size:13.5px; color: var(--text-muted); }
+  .err-item:last-child{ border-bottom:none; }
+  .err-icon{ font-family: var(--mono); color: var(--amber); flex-shrink:0; font-size:12px; margin-top:2px; }
+  footer{
+    max-width:1360px; margin: 40px auto 0; padding: 20px clamp(18px,4vw,56px) 0;
+    border-top:1px solid var(--border-soft); color: var(--text-dim); font-size:12px; font-family: var(--mono);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div>
+    <div class="brand-row">
+      <div class="brand-mark">CE</div>
+      <span class="eyebrow">Centro de Enlace · Bitácora + Supervisión Virtual</span>
+    </div>
+    <h1>Tablero Unificado — Guardia 16–17/09/2026</h1>
+    <div class="sub">Reportes matutino/vespertino por OOAD, supervisiones virtuales, monitoreo de turno, hitos CECOE, cobertura SV y análisis de ritmo de llamadas.</div>
+  </div>
+  <div class="status-pill"><span class="dot"></span> 14 OOAD · 0 FT reportes · 11/14 con SV · 100% completo</div>
+</div>
+
+<div class="wrap">
+
+  <!-- KPIs -->
+  <section>
+    <div class="kpis">
+      <div class="kpi accent-teal"><div class="label">Registros totales</div><div class="num">43</div><div class="foot">20 el 16 · 23 el 17</div></div>
+      <div class="kpi accent-green"><div class="label">Reportado completo</div><div class="num">43</div><div class="foot">100% del total</div></div>
+      <div class="kpi accent-green"><div class="label">Fuera de tiempo</div><div class="num">0</div><div class="foot">sin desviaciones formales</div></div>
+      <div class="kpi accent-amber"><div class="label">SV ejecutadas</div><div class="num">11</div><div class="foot">todas sin novedad</div></div>
+      <div class="kpi accent-red"><div class="label">OOAD sin SV</div><div class="num">3</div><div class="foot">BC · NL · Tamaulipas</div></div>
+      <div class="kpi accent-green"><div class="label">Estados con cierre</div><div class="num">14/14</div><div class="foot">mat + ves a tiempo</div></div>
+    </div>
+  </section>
+
+  <!-- Timeline matutino -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <span class="section-title">Línea de tiempo — reportes matutinos 17/09</span>
+      <span class="section-note">05:00 – 07:30 hrs · todos a tiempo</span>
+    </div>
+    <div class="timeline-card">
+      <div class="timeline-legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span> A tiempo</div>
+      </div>
+      <div class="timeline-axis" id="timelineAxis"></div>
+    </div>
+  </section>
+
+  <!-- Estatus OOAD unificado: reportes + SV -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <span class="section-title">Estatus unificado por Estado / OOAD</span>
+      <span class="section-note">Reportes + cobertura SV</span>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Estado / OOAD</th>
+            <th>Coordinador</th>
+            <th class="num">Rep. mat/ves</th>
+            <th class="num">Completos</th>
+            <th class="num">FT</th>
+            <th class="num">SV</th>
+            <th>Unidad SV</th>
+            <th>Estatus reportes</th>
+            <th>Estatus SV</th>
+          </tr>
+        </thead>
+        <tbody id="ooadBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Desviaciones / missing / hitos -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <span class="section-title">Desviaciones, omisiones e hitos</span>
+    </div>
+    <div class="three-col">
+      <div>
+        <div class="section-title" style="font-size:14px; color:var(--red); margin-bottom:10px;">Reportes fuera de tiempo</div>
+        <div class="empty-box">Ninguno. Los 14 estados cerraron vespertino (16) y matutino (17) a tiempo.</div>
+        <div class="section-title" style="font-size:14px; color:var(--red); margin:18px 0 10px;">OOAD sin supervisión virtual</div>
+        <div class="miss-item">BAJA CALIFORNIA</div>
+        <div class="miss-item">NUEVO LEÓN</div>
+        <div class="miss-item">TAMAULIPAS</div>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:14px; color:var(--amber); margin-bottom:10px;">Hitos CECOE</div>
+        <div class="hito-item">
+          <div class="row1"><span class="title">NOTA INFORMATIVA</span><span class="meta">21:58 · 16/09</span></div>
+          <div class="loc">IMSS CENTRALES · CECOE · Folio 4351</div>
+          <div class="note">Manifestaciones del personal IMSS afuera de oficinas del SNTSS.</div>
+        </div>
+        <div class="hito-item">
+          <div class="row1"><span class="title">ORDEN DEL DÍA</span><span class="meta">05:05 · 17/09</span></div>
+          <div class="loc">IMSS CENTRALES · CECOE · Folio 4364</div>
+          <div class="note">Integra orden del día y decálogo de trato digno.</div>
+        </div>
+        <div class="section-title" style="font-size:14px; color:var(--amber); margin:14px 0 10px;">Monitoreo de turno</div>
+        <div class="info-box" style="margin-bottom:8px">Folio 4352 · 16/09 · <span style="font-family:var(--mono)">22:00</span> · Completo</div>
+        <div class="info-box">Folio 4371 · 17/09 · <span style="font-family:var(--mono)">06:00</span> · Completo</div>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:14px; color:var(--teal); margin-bottom:10px;">Ronda SV (Kevin D. Maldonado)</div>
+        <div class="info-box" style="margin-bottom:12px">
+          <div style="margin-bottom:6px"><b>Inicio:</b> Sinaloa HGZ#32 · 22:35 (16/09)</div>
+          <div style="margin-bottom:6px"><b>Cierre:</b> Durango UMF#50 · 04:18 (17/09)</div>
+          <div><b>Resultado:</b> 11/11 sin novedad</div>
+        </div>
+        <div id="svList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dual regression -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <span class="section-title">Análisis de regresión</span>
+      <span class="section-note">Matutinos · Ritmo SV</span>
+    </div>
+    <div class="reg-grid">
+      <div class="reg-card">
+        <div style="font-family:var(--display); font-weight:600; margin-bottom:8px; font-size:15px;">A) Probabilidad de retraso matutino</div>
+        <div class="chart-wrap"><canvas id="regMat"></canvas></div>
+        <div class="reg-stats" style="margin-top:12px">
+          <div class="stat-box"><div class="k">Casos FT</div><div class="v" style="color:var(--green)">0</div></div>
+          <div class="stat-box"><div class="k">N muestras</div><div class="v">14</div></div>
+          <div class="stat-box"><div class="k">Más temprano</div><div class="v">05:00</div></div>
+          <div class="stat-box"><div class="k">Más tardío</div><div class="v">06:51</div></div>
+        </div>
+        <ul class="reg-notes">
+          <li>Regresión logística <b>no estimable</b>: 0 casos fuera de tiempo.</li>
+          <li>Cierres entre BCS 05:00 y Tamaulipas 06:51.</li>
+          <li>Sinaloa reporta 4 códigos plata en permanencia.</li>
+        </ul>
+      </div>
+      <div class="reg-card">
+        <div style="font-family:var(--display); font-weight:600; margin-bottom:8px; font-size:15px;">B) Ritmo de llamadas SV</div>
+        <div class="chart-wrap"><canvas id="regSv"></canvas></div>
+        <div class="reg-stats" style="margin-top:12px">
+          <div class="stat-box"><div class="k">Correlación (r)</div><div class="v">0.98</div></div>
+          <div class="stat-box"><div class="k">Intervalo medio</div><div class="v">34 min</div></div>
+          <div class="stat-box"><div class="k">Gap mín / máx</div><div class="v">17 / 99</div></div>
+          <div class="stat-box"><div class="k">Pendiente</div><div class="v">≈31 min</div></div>
+        </div>
+        <ul class="reg-notes">
+          <li>Orden de llamada vs. tiempo: ritmo muy constante (r=0.98).</li>
+          <li>Excepción: gap de 99 min Chihuahua 02:39 → Durango 04:18.</li>
+          <li>Describe ritmo operativo, no riesgo de falla (todas sin novedad).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detalle SV table -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <span class="section-title">Detalle de supervisiones virtuales ejecutadas</span>
+      <span class="section-note">11 llamadas · sin novedad</span>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Folio</th><th>Estado</th><th>Unidad</th><th>Municipio</th>
+            <th>Fecha</th><th>Hora</th><th>Estatus</th>
+          </tr>
+        </thead>
+        <tbody id="svBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Errors unified -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <span class="section-title">Errores e inconsistencias (bitácora + SV)</span>
+    </div>
+    <div class="err-card" id="errList"></div>
+  </section>
+
+</div>
+<footer>
+  <span>Fuentes: tabla 16 AL 17 SEP 2026.xlsx · TABLA MONITOREO 16 ves Y 17 mat.xlsx</span>
+  <span>Tablero unificado · 16–17/09/2026</span>
+</footer>
+
+<script>
+const MAT_POINTS = [
+  {ooad:'BAJA CALIFORNIA SUR', hora:'05:00', minutos:300},
+  {ooad:'SINALOA', hora:'05:01', minutos:301},
+  {ooad:'SONORA', hora:'05:02', minutos:302},
+  {ooad:'BAJA CALIFORNIA', hora:'05:47', minutos:347},
+  {ooad:'NUEVO LEÓN', hora:'05:57', minutos:357},
+  {ooad:'JALISCO', hora:'06:00', minutos:360},
+  {ooad:'ZACATECAS', hora:'06:00', minutos:360},
+  {ooad:'CHIHUAHUA', hora:'06:16', minutos:376},
+  {ooad:'COAHUILA', hora:'06:34', minutos:394},
+  {ooad:'NAYARIT', hora:'06:35', minutos:395},
+  {ooad:'DURANGO', hora:'06:35', minutos:395},
+  {ooad:'AGUASCALIENTES', hora:'06:35', minutos:395},
+  {ooad:'SAN LUIS POTOSÍ', hora:'06:40', minutos:400},
+  {ooad:'TAMAULIPAS', hora:'06:51', minutos:411},
+];
+
+const OOAD = [
+  {o:'AGUASCALIENTES', c:'RICARDO NANDI', rep:2, sv:1, u:'UMF#9', ok:1},
+  {o:'BAJA CALIFORNIA', c:'EDGAR ACOSTA ESCARCEGA', rep:2, sv:0, u:'—', ok:1},
+  {o:'BAJA CALIFORNIA SUR', c:'LEONCIO CORONADO GALINDO', rep:2, sv:1, u:'UMF#19', ok:1},
+  {o:'CHIHUAHUA', c:'HECTOR GABRIEL BOLLY', rep:2, sv:1, u:'HGR#2', ok:1},
+  {o:'COAHUILA', c:'CESAR FRANCISCO CEDILLO PEREZ', rep:2, sv:1, u:'HGZ#24', ok:1},
+  {o:'DURANGO', c:'HECTOR ALFONSO LUJAN FLORIANO', rep:2, sv:1, u:'UMF#50', ok:1},
+  {o:'JALISCO', c:'MARIO ALBERTO FLORES ALEISSA', rep:2, sv:1, u:'LAB. CITOLOGÍA', ok:1},
+  {o:'NAYARIT', c:'AARON RICARDO PALMA ROMAN', rep:2, sv:1, u:'UMF#26', ok:1},
+  {o:'NUEVO LEÓN', c:'JOSE ANTONIO RAMOS AGUILAR', rep:2, sv:0, u:'—', ok:1},
+  {o:'SAN LUIS POTOSÍ', c:'ADRIAN LEYVA', rep:2, sv:1, u:'HGZ#2', ok:1},
+  {o:'SINALOA', c:'RAUL GALLARDO VELÀZQUEZ', rep:2, sv:1, u:'HGZ#32', ok:1},
+  {o:'SONORA', c:'GUSTAVO ALONSO RASCON EVANS', rep:2, sv:1, u:'UMF#66', ok:1},
+  {o:'TAMAULIPAS', c:'RONALD HERNANDEZ', rep:2, sv:0, u:'—', ok:1},
+  {o:'ZACATECAS', c:'EDUARDO AYALA LOPEZ', rep:2, sv:1, u:'HR#8', ok:1},
+];
+
+const SV_ROWS = [
+  {f:4353, e:'SINALOA', u:'HGZ#32', m:'GUASAVE', d:'16/09', h:'22:35'},
+  {f:4354, e:'SAN LUIS POTOSÍ', u:'HGZ#2', m:'SAN LUIS POTOSI', d:'16/09', h:'23:00'},
+  {f:4355, e:'ZACATECAS', u:'HR#8', m:'PINOS ZACATECAS', d:'16/09', h:'23:23'},
+  {f:4356, e:'BAJA CALIFORNIA SUR', u:'UMF#19', m:'CALIFORNIA SUR', d:'16/09', h:'23:56'},
+  {f:4357, e:'JALISCO', u:'LABORATORIO DE CITOLOGIA', m:'JALISCO', d:'17/09', h:'00:20'},
+  {f:4358, e:'AGUASCALIENTES', u:'UMF#9', m:'AGUASCALIENTES', d:'17/09', h:'00:40'},
+  {f:4359, e:'SONORA', u:'UMF#66', m:'SONORA', d:'17/09', h:'01:02'},
+  {f:4360, e:'COAHUILA', u:'HGZ#24', m:'COAHUILA', d:'17/09', h:'01:53'},
+  {f:4361, e:'NAYARIT', u:'UMF#26', m:'XALISCO', d:'17/09', h:'02:10'},
+  {f:4362, e:'CHIHUAHUA', u:'HGR#2', m:'CHIHUAHUA', d:'17/09', h:'02:39'},
+  {f:4363, e:'DURANGO', u:'UMF#50', m:'DURANGO', d:'17/09', h:'04:18'},
+];
+
+const GAPS = [25,23,33,24,20,22,51,17,29,99];
+
+const ERRORES = [
+  'Folio 4371 (MONITOREO): fecha capturada como "17/0972026" (corrupta). Debe ser 17/09/2026.',
+  'Baja California Sur · REPORTE VESPERTINO 16/09 a las 05:00: horario anómalo para cierre vespertino (posible zona o error de captura).',
+  'BCS matutino 17/09 también a las 05:00 (coherente con zona Pacífico si se registra en hora local).',
+  'SLA vacío en casi todos los registros; solo 2 notas de CECOE.',
+  'Coordinador de Aguascalientes capturado como "RICARDO NANDI" (antes NORI).',
+  'Nombre con posible inconsistencia: "RAUL GALLARDO VELÀZQUEZ" (acento grave).',
+  'Municipio BCS en SV capturado como "CALIFORNIA SUR" (incompleto).',
+  'Observaciones SV idénticas en las 11 llamadas ("sin novedad"); sin variación cualitativa.',
+  'Cobertura SV incompleta: faltan Baja California, Nuevo León y Tamaulipas (3 de 14).',
+  'Brecha máxima entre SV consecutivas: 99 min (Chihuahua 02:39 → Durango 04:18).',
+  'No hay ESTATUS FUERA DE TIEMPO ni NO REPORTADO en reportes matutino/vespertino.',
+];
+
+// Timeline
+const axis = document.getElementById('timelineAxis');
+const minStart = 300, minEnd = 450;
+let hourMarks = '';
+for (let h=5; h<=7; h++){
+  const pct = ((h*60)-minStart)/(minEnd-minStart)*100;
+  hourMarks += `<div class="hm" style="left:${pct}%">${String(h).padStart(2,'0')}:00</div>`;
+}
+axis.innerHTML = `<div class="timeline-line"></div><div class="timeline-hourmarks">${hourMarks}</div>`;
+MAT_POINTS.forEach(p => {
+  const pct = Math.min(100, Math.max(0, (p.minutos - minStart)/(minEnd-minStart)*100));
+  const el = document.createElement('div');
+  el.className = 'tpoint ok';
+  el.style.left = pct + '%';
+  el.innerHTML = `<div class="tip">${p.ooad} · ${p.hora}</div>`;
+  axis.appendChild(el);
+});
+
+// OOAD table sorted: missing SV first
+const sorted = [...OOAD].sort((a,b) => (a.sv - b.sv) || a.o.localeCompare(b.o));
+document.getElementById('ooadBody').innerHTML = sorted.map(r => {
+  const bRep = '<span class="badge ok"><span class="badge-dot"></span>OK</span>';
+  const bSv = r.sv
+    ? '<span class="badge ok"><span class="badge-dot"></span>Con SV</span>'
+    : '<span class="badge miss"><span class="badge-dot"></span>Sin SV</span>';
+  return `<tr>
+    <td style="font-family:var(--display);font-weight:600">${r.o}</td>
+    <td class="muted">${r.c}</td>
+    <td class="num">${r.rep}</td>
+    <td class="num">${r.rep}</td>
+    <td class="num" style="color:var(--text-dim)">0</td>
+    <td class="num" style="color:${r.sv?'var(--green)':'var(--red)'}">${r.sv}</td>
+    <td class="muted">${r.u}</td>
+    <td>${bRep}</td>
+    <td>${bSv}</td>
+  </tr>`;
+}).join('');
+
+// SV compact list
+document.getElementById('svList').innerHTML = SV_ROWS.map(s =>
+  `<div class="sv-item"><span><span class="u">${s.e}</span> · ${s.u}</span><span style="font-family:var(--mono);color:var(--text-dim)">${s.h} · ${s.d}</span></div>`
+).join('');
+
+// SV detail
+document.getElementById('svBody').innerHTML = SV_ROWS.map(r => `<tr>
+  <td style="font-family:var(--mono)">${r.f}</td>
+  <td style="font-family:var(--display);font-weight:600">${r.e}</td>
+  <td class="muted">${r.u}</td>
+  <td class="muted">${r.m}</td>
+  <td class="muted">${r.d}/2026</td>
+  <td style="font-family:var(--mono)">${r.h}</td>
+  <td><span class="badge ok"><span class="badge-dot"></span>Completo</span></td>
+</tr>`).join('');
+
+// Errors
+document.getElementById('errList').innerHTML = ERRORES.map(e =>
+  `<div class="err-item"><span class="err-icon">▲</span><span>${e}</span></div>`).join('');
+
+// Chart A - flat zero risk
+const curveH = [];
+for (let m=300; m<=450; m+=5) curveH.push(`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`);
+new Chart(document.getElementById('regMat'), {
+  type: 'line',
+  data: {
+    labels: curveH,
+    datasets: [
+      { label: 'Prob. FT (≈0)', data: curveH.map(()=>0), borderColor:'#2AC9B8', backgroundColor:'rgba(42,201,184,0.10)', fill:true, tension:0.25, pointRadius:0, borderWidth:2 },
+      { label: 'Observados', data: curveH.map(h => {
+          const [hh,mm]=h.split(':').map(Number); const min=hh*60+mm;
+          return MAT_POINTS.some(p => Math.abs(p.minutos-min)<3) ? 0 : null;
+        }),
+        borderColor:'transparent',
+        pointBackgroundColor: curveH.map(h => {
+          const [hh,mm]=h.split(':').map(Number); const min=hh*60+mm;
+          return MAT_POINTS.some(p => Math.abs(p.minutos-min)<3) ? '#33C077' : 'transparent';
+        }),
+        pointRadius: curveH.map(h => {
+          const [hh,mm]=h.split(':').map(Number); const min=hh*60+mm;
+          return MAT_POINTS.some(p => Math.abs(p.minutos-min)<3) ? 5 : 0;
+        }),
+        showLine:false }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ color:'#8AA0C2', font:{family:'Inter', size:11} } } },
+    scales:{
+      x:{ ticks:{ color:'#566A8E', maxTicksLimit:7, font:{family:'IBM Plex Mono', size:10} }, grid:{ color:'#16233B' } },
+      y:{ ticks:{ color:'#566A8E', callback:v=>v+'%', font:{family:'IBM Plex Mono', size:10} }, grid:{ color:'#16233B' }, min:0, max:100 }
+    }
+  }
+});
+
+// Chart B - SV cumulative
+let acc=0; const cum=[0];
+GAPS.forEach(g => { acc+=g; cum.push(acc); });
+new Chart(document.getElementById('regSv'), {
+  type: 'line',
+  data: {
+    labels: SV_ROWS.map((r,i)=>`${i+1}. ${r.e.slice(0,8)}`),
+    datasets: [{
+      label: 'Minutos desde 1ª SV',
+      data: cum,
+      borderColor:'#2AC9B8', backgroundColor:'rgba(42,201,184,0.10)', fill:true, tension:0.2,
+      pointRadius:4, pointBackgroundColor:'#2AC9B8', borderWidth:2
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ color:'#8AA0C2', font:{family:'Inter', size:11} } } },
+    scales:{
+      x:{ ticks:{ color:'#566A8E', font:{family:'IBM Plex Mono', size:9}, maxRotation:45 }, grid:{ color:'#16233B' } },
+      y:{ ticks:{ color:'#566A8E', font:{family:'IBM Plex Mono', size:10}, callback:v=>v+' min' }, grid:{ color:'#16233B' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
