@@ -1,0 +1,366 @@
+[index.html.html](https://github.com/user-attachments/files/32392460/index.html.html)
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero Unificado — Guardia 17–18/09/2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0A1220; --panel:#101B31; --panel-2:#0D1728;
+    --border:#1E2D48; --border-soft:#16233B; --text:#E7EDF7; --muted:#8AA0C2; --dim:#566A8E;
+    --teal:#2AC9B8; --amber:#F0A93E; --red:#F14C6B; --green:#33C077;
+    --green-soft:rgba(51,192,119,.13); --red-soft:rgba(241,76,107,.14); --amber-soft:rgba(240,169,62,.14);
+    --display:'Space Grotesk',sans-serif; --body:Inter,sans-serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1100px 500px at 12% -10%,rgba(42,201,184,.10),transparent 60%),
+      radial-gradient(900px 500px at 100% 0%,rgba(240,169,62,.06),transparent 55%),var(--bg);
+    color:var(--text); font-family:var(--body); line-height:1.5; padding:0 0 64px;
+  }
+  .masthead{
+    border-bottom:1px solid var(--border-soft); padding:28px clamp(18px,4vw,56px) 22px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; position:relative;
+  }
+  .masthead::before{content:""; position:absolute; left:0; right:0; top:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--teal) 20%,var(--teal) 80%,transparent); opacity:.55}
+  .brand-row{display:flex; align-items:center; gap:12px; margin-bottom:10px}
+  .brand-mark{width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,var(--teal),#157A6E);
+    display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:600; font-size:13px; color:#04201B}
+  .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim)}
+  h1{font-family:var(--display); font-weight:600; font-size:clamp(22px,3.2vw,32px); margin:2px 0 6px}
+  .sub{color:var(--muted); font-size:14px; max-width:760px}
+  .status-pill{font-family:var(--mono); font-size:12.5px; display:inline-flex; align-items:center; gap:8px;
+    background:var(--panel); border:1px solid var(--border); padding:9px 14px; border-radius:999px; color:var(--muted)}
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--amber); box-shadow:0 0 0 3px var(--amber-soft)}
+  .wrap{padding:30px clamp(18px,4vw,56px) 0; max-width:1360px; margin:0 auto}
+  section{margin-bottom:40px}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:16px; flex-wrap:wrap}
+  .section-num{font-family:var(--mono); color:var(--teal); font-size:12.5px}
+  .section-title{font-family:var(--display); font-size:19px; font-weight:600}
+  .section-note{color:var(--dim); font-size:12.5px; margin-left:auto; font-family:var(--mono)}
+  .kpis{display:grid; grid-template-columns:repeat(6,1fr); gap:12px}
+  @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:linear-gradient(180deg,var(--panel),var(--panel-2)); border:1px solid var(--border); border-radius:14px; padding:16px}
+  .kpi .label{font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em; font-family:var(--mono)}
+  .kpi .num{font-family:var(--display); font-size:28px; font-weight:600; margin-top:6px}
+  .kpi .foot{font-size:11.5px; color:var(--muted); margin-top:4px}
+  .kpi.accent-red .num{color:var(--red)} .kpi.accent-amber .num{color:var(--amber)}
+  .kpi.accent-green .num{color:var(--green)} .kpi.accent-teal .num{color:var(--teal)}
+  .timeline-card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px clamp(14px,3vw,26px) 18px}
+  .timeline-legend{display:flex; gap:18px; margin-bottom:14px; flex-wrap:wrap; font-size:12px; color:var(--muted); font-family:var(--mono)}
+  .legend-item{display:flex; align-items:center; gap:7px}
+  .legend-swatch{width:9px; height:9px; border-radius:2px}
+  .timeline-axis{position:relative; height:96px}
+  .timeline-line{position:absolute; left:0; right:0; top:48px; height:1px; background:var(--border)}
+  .timeline-hourmarks{position:absolute; left:0; right:0; top:64px; height:20px}
+  .hm{position:absolute; transform:translateX(-50%); font-family:var(--mono); font-size:10.5px; color:var(--dim)}
+  .hm::before{content:""; position:absolute; left:50%; top:-16px; width:1px; height:8px; background:var(--border-soft)}
+  .tpoint{position:absolute; top:38px; width:13px; height:13px; border-radius:50%; transform:translateX(-50%); border:2px solid var(--bg)}
+  .tpoint.ok{background:var(--green); box-shadow:0 0 0 3px var(--green-soft)}
+  .tpoint .tip{visibility:hidden; opacity:0; position:absolute; bottom:22px; left:50%; transform:translateX(-50%);
+    background:#050B15; border:1px solid var(--border); color:var(--text); font-size:11px; font-family:var(--mono);
+    padding:6px 9px; border-radius:8px; white-space:nowrap; z-index:5; transition:opacity .15s}
+  .tpoint:hover .tip{visibility:visible; opacity:1}
+  .table-card{background:var(--panel); border:1px solid var(--border); border-radius:14px; overflow:hidden; overflow-x:auto}
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  thead th{text-align:left; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--dim); padding:12px 14px; border-bottom:1px solid var(--border); background:var(--panel-2); white-space:nowrap}
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--border-soft); vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  td.num,th.num{font-family:var(--mono); text-align:right}
+  .badge{display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:999px; font-family:var(--mono); font-size:11px; white-space:nowrap}
+  .badge.ok{background:var(--green-soft); color:var(--green)}
+  .badge.miss{background:var(--red-soft); color:var(--red)}
+  .badge.warn{background:var(--amber-soft); color:var(--amber)}
+  .badge-dot{width:6px; height:6px; border-radius:50%; background:currentColor}
+  .muted{color:var(--muted)}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start}
+  .three-col{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:start}
+  @media(max-width:980px){.two-col,.three-col{grid-template-columns:1fr}}
+  .empty-box,.info-box{border:1px dashed var(--border); border-radius:10px; padding:16px; color:var(--dim); font-size:13.5px; background:var(--panel)}
+  .info-box{border-style:solid; border-left:3px solid var(--amber)}
+  .miss-item{border:1px solid var(--border); border-left:3px solid var(--red); background:var(--panel); border-radius:10px; padding:12px 14px; margin-bottom:10px; font-family:var(--display); font-weight:600}
+  .dev-item,.hito-item{border:1px solid var(--border); background:var(--panel); border-radius:10px; padding:14px 16px; margin-bottom:12px; border-left:3px solid var(--red)}
+  .hito-item{border-left-color:var(--amber)}
+  .dev-item .row1,.hito-item .row1{display:flex; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap}
+  .dev-item .title,.hito-item .title{font-family:var(--display); font-weight:600; font-size:14px}
+  .dev-item .meta,.hito-item .meta{font-family:var(--mono); font-size:11px; color:var(--dim); white-space:nowrap}
+  .dev-item .loc,.hito-item .loc{font-size:12px; color:var(--muted); margin-bottom:5px}
+  .dev-item .note,.hito-item .note{font-size:12.5px; color:var(--muted)}
+  .sv-item{border:1px solid var(--border-soft); background:var(--panel-2); border-radius:8px; padding:10px 14px; margin-bottom:8px; font-size:12.5px; color:var(--muted); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  .sv-item .u{color:var(--text); font-family:var(--display); font-weight:600; font-size:13px}
+  .reg-grid{display:grid; grid-template-columns:1.2fr 1fr; gap:20px}
+  @media(max-width:980px){.reg-grid{grid-template-columns:1fr}}
+  .reg-card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px}
+  .reg-stats{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .stat-box{background:var(--panel-2); border:1px solid var(--border-soft); border-radius:10px; padding:12px 14px}
+  .stat-box .k{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em}
+  .stat-box .v{font-family:var(--display); font-size:20px; font-weight:600; margin-top:4px}
+  .chart-wrap{height:240px; margin-top:8px}
+  .reg-notes{font-size:13px; color:var(--muted); margin-top:14px; padding-left:18px}
+  .reg-notes li{margin-bottom:8px}
+  .err-card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:6px 0}
+  .err-item{display:flex; gap:12px; padding:13px 20px; border-bottom:1px solid var(--border-soft); font-size:13.5px; color:var(--muted)}
+  .err-item:last-child{border-bottom:none}
+  .err-icon{font-family:var(--mono); color:var(--amber); flex-shrink:0; font-size:12px; margin-top:2px}
+  footer{max-width:1360px; margin:40px auto 0; padding:20px clamp(18px,4vw,56px) 0; border-top:1px solid var(--border-soft);
+    color:var(--dim); font-size:12px; font-family:var(--mono); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div>
+    <div class="brand-row"><div class="brand-mark">CE</div><span class="eyebrow">Centro de Enlace · Bitácora + Supervisión Virtual</span></div>
+    <h1>Tablero Unificado — Guardia 17–18/09/2026</h1>
+    <div class="sub">Reportes mat/ves, incidentes (Código Rosa, agresión), supervisiones virtuales, hitos CECOE y estatus por OOAD con desviaciones.</div>
+  </div>
+  <div class="status-pill"><span class="dot"></span> 1 FT · 2 incompletos · 11/14 SV · 14/14 cierres</div>
+</div>
+
+<div class="wrap">
+  <section>
+    <div class="kpis" id="kpiGrid"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <span class="section-title">Línea de tiempo — matutinos 18/09</span>
+      <span class="section-note">05:00 – 07:00 · todos a tiempo</span>
+    </div>
+    <div class="timeline-card">
+      <div class="timeline-legend"><div class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span> A tiempo</div></div>
+      <div class="timeline-axis" id="timelineAxis"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <span class="section-title">Estatus unificado por Estado / OOAD</span>
+      <span class="section-note">Reportes + SV · desviaciones resaltadas</span>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Estado / OOAD</th><th>Coordinador</th>
+            <th class="num">Mat</th><th class="num">Ves</th><th>Hora mat</th>
+            <th class="num">FT</th><th class="num">Incomp.</th>
+            <th>Estatus reporte</th>
+            <th class="num">SV</th><th>Unidad SV</th><th>Hora SV</th>
+            <th>Estatus SV</th>
+          </tr>
+        </thead>
+        <tbody id="ooadBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <span class="section-title">Desviaciones, omisiones e hitos</span>
+    </div>
+    <div class="three-col">
+      <div>
+        <div class="section-title" style="font-size:14px;color:var(--red);margin-bottom:10px">Reportes con desviación</div>
+        <div id="devList"></div>
+        <div class="section-title" style="font-size:14px;color:var(--red);margin:18px 0 10px">OOAD sin SV</div>
+        <div id="missList"></div>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:14px;color:var(--amber);margin-bottom:10px">Hitos e incidentes relevantes</div>
+        <div id="hitoList"></div>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:14px;color:var(--teal);margin-bottom:10px">Ronda SV (Kevin D. Maldonado)</div>
+        <div class="info-box" id="svHitos" style="margin-bottom:12px"></div>
+        <div id="svList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <span class="section-title">Análisis de regresión</span>
+      <span class="section-note">Matutinos · Ritmo SV</span>
+    </div>
+    <div class="reg-grid">
+      <div class="reg-card">
+        <div style="font-family:var(--display);font-weight:600;margin-bottom:8px;font-size:15px">A) Probabilidad de retraso matutino</div>
+        <div class="chart-wrap"><canvas id="regMat"></canvas></div>
+        <div class="reg-stats" style="margin-top:12px" id="regMatStats"></div>
+        <ul class="reg-notes" id="regMatNotes"></ul>
+      </div>
+      <div class="reg-card">
+        <div style="font-family:var(--display);font-weight:600;margin-bottom:8px;font-size:15px">B) Ritmo de llamadas SV</div>
+        <div class="chart-wrap"><canvas id="regSv"></canvas></div>
+        <div class="reg-stats" style="margin-top:12px" id="regSvStats"></div>
+        <ul class="reg-notes" id="regSvNotes"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <span class="section-title">Errores e inconsistencias</span>
+    </div>
+    <div class="err-card" id="errList"></div>
+  </section>
+</div>
+<footer>
+  <span>Fuente: tabla 17 AL 18 SEP 2026.xlsx</span>
+  <span>Tablero unificado · 17–18/09/2026</span>
+</footer>
+
+<script>
+const DASH = {"meta": {"fecha": "17–18/09/2026", "total": 54, "completo": 51, "fuera": 1, "incomp": 2, "sv": 11, "mat": 14, "ves": 14, "ooad_dev": 2, "sv_miss": 3}, "ooad": [{"ooad": "AGUASCALIENTES", "coord": "RICARDO NANDI", "mat": 1, "ves": 1, "hora_mat": "06:03", "min_mat": 363, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "SEDE DELEGACIONAL", "sv_hora": "23:25", "sv_fecha": "17/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "BAJA CALIFORNIA", "coord": "EDGAR ACOSTA ESCARCEGA", "mat": 1, "ves": 1, "hora_mat": "05:36", "min_mat": 336, "ft": 0, "incomp": 0, "sv": 0, "sv_unidad": "—", "sv_hora": "—", "sv_fecha": "—", "estatus_rep": "OK", "estatus_sv": "SIN SV"}, {"ooad": "BAJA CALIFORNIA SUR", "coord": "LEONCIO CORONADO GALINDO", "mat": 1, "ves": 1, "hora_mat": "05:00", "min_mat": 300, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "UMF#35", "sv_hora": "23:45", "sv_fecha": "17/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "CHIHUAHUA", "coord": "HECTOR GABRIEL BOLLY", "mat": 1, "ves": 1, "hora_mat": "06:49", "min_mat": 409, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "SUBDELAGACION", "sv_hora": "02:00", "sv_fecha": "18/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "COAHUILA", "coord": "CESAR FRANCISCO CEDILLO PEREZ", "mat": 1, "ves": 1, "hora_mat": "06:03", "min_mat": 363, "ft": 0, "incomp": 0, "sv": 0, "sv_unidad": "—", "sv_hora": "—", "sv_fecha": "—", "estatus_rep": "OK", "estatus_sv": "SIN SV"}, {"ooad": "DURANGO", "coord": "HECTOR ALFONSO LUJAN FLORIANO", "mat": 1, "ves": 1, "hora_mat": "06:31", "min_mat": 391, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "UMF#45", "sv_hora": "00:53", "sv_fecha": "18/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "JALISCO", "coord": "MARIO ALBERTO FLORES ALEISSA", "mat": 1, "ves": 1, "hora_mat": "06:00", "min_mat": 360, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "UMF#71", "sv_hora": "01:38", "sv_fecha": "18/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "NAYARIT", "coord": "AARON RICARDO PALMA ROMAN", "mat": 1, "ves": 1, "hora_mat": "06:36", "min_mat": 396, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "HGZ#10", "sv_hora": "03:52", "sv_fecha": "18/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "NUEVO LEÓN", "coord": "JOSE ANTONIO RAMOS AGUILAR", "mat": 1, "ves": 1, "hora_mat": "05:23", "min_mat": 323, "ft": 0, "incomp": 0, "sv": 0, "sv_unidad": "—", "sv_hora": "—", "sv_fecha": "—", "estatus_rep": "OK", "estatus_sv": "SIN SV"}, {"ooad": "SAN LUIS POTOSÍ", "coord": "LUCIA RAPETA QUIRINO", "mat": 1, "ves": 1, "hora_mat": "06:13", "min_mat": 373, "ft": 1, "incomp": 0, "sv": 1, "sv_unidad": "HGZ#50", "sv_hora": "00:23", "sv_fecha": "18/09/2026", "estatus_rep": "DESVIACIÓN", "estatus_sv": "OK"}, {"ooad": "SINALOA", "coord": "RAUL GALLARDO VELÀZQUEZ", "mat": 1, "ves": 1, "hora_mat": "05:01", "min_mat": 301, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "UMF#9", "sv_hora": "22:53", "sv_fecha": "17/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "SONORA", "coord": "GUSTAVO ALONSO RASCON EVANS", "mat": 1, "ves": 1, "hora_mat": "05:02", "min_mat": 302, "ft": 0, "incomp": 1, "sv": 1, "sv_unidad": "UMF#4", "sv_hora": "22:25", "sv_fecha": "17/09/2026", "estatus_rep": "DESVIACIÓN", "estatus_sv": "OK"}, {"ooad": "TAMAULIPAS", "coord": "RONALD HERNANDEZ", "mat": 1, "ves": 1, "hora_mat": "06:28", "min_mat": 388, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "HRB#03", "sv_hora": "00:09", "sv_fecha": "18/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}, {"ooad": "ZACATECAS", "coord": "EDUARDO AYALA LOPEZ", "mat": 1, "ves": 1, "hora_mat": "06:00", "min_mat": 360, "ft": 0, "incomp": 0, "sv": 1, "sv_unidad": "HR#51", "sv_hora": "03:25", "sv_fecha": "18/09/2026", "estatus_rep": "OK", "estatus_sv": "OK"}], "mat_pts": [{"ooad": "AGUASCALIENTES", "hora": "06:03", "minutos": 363, "fuera_tiempo": 0}, {"ooad": "BAJA CALIFORNIA", "hora": "05:36", "minutos": 336, "fuera_tiempo": 0}, {"ooad": "BAJA CALIFORNIA SUR", "hora": "05:00", "minutos": 300, "fuera_tiempo": 0}, {"ooad": "CHIHUAHUA", "hora": "06:49", "minutos": 409, "fuera_tiempo": 0}, {"ooad": "COAHUILA", "hora": "06:03", "minutos": 363, "fuera_tiempo": 0}, {"ooad": "DURANGO", "hora": "06:31", "minutos": 391, "fuera_tiempo": 0}, {"ooad": "JALISCO", "hora": "06:00", "minutos": 360, "fuera_tiempo": 0}, {"ooad": "NAYARIT", "hora": "06:36", "minutos": 396, "fuera_tiempo": 0}, {"ooad": "NUEVO LEÓN", "hora": "05:23", "minutos": 323, "fuera_tiempo": 0}, {"ooad": "SAN LUIS POTOSÍ", "hora": "06:13", "minutos": 373, "fuera_tiempo": 0}, {"ooad": "SINALOA", "hora": "05:01", "minutos": 301, "fuera_tiempo": 0}, {"ooad": "SONORA", "hora": "05:02", "minutos": 302, "fuera_tiempo": 0}, {"ooad": "TAMAULIPAS", "hora": "06:28", "minutos": 388, "fuera_tiempo": 0}, {"ooad": "ZACATECAS", "hora": "06:00", "minutos": 360, "fuera_tiempo": 0}], "devs": [{"folio": 4394, "ooad": "SAN LUIS POTOSÍ", "incidencia": "AGRESION VERBAL A GUIARDIA", "hora": "10:31", "fecha": "17/09/2026", "estatus": "FUERA DE TIEMPO", "unidad": "UMF#4", "obs": "REPORTA COORDINADOR EL PERCANSE SE TUVO DE GUARDIA DE SEGURIDAD Y DERECHOHABIENTE MANIFESTANDO QUE EL DERECHOHABIENTE LE ESCUPE EN LA CARA Y DESUES A LOS GOLPES MINUTOS MAS TARDE SE DIRIJE EL SUPERVIS", "sla": "EQUIPO CECOE SOLICITA LA INFORMACION PORQUE DISCUTIERON"}, {"folio": 4396, "ooad": "SONORA", "incidencia": "CODIGO ROSA", "hora": "18:48", "fecha": "17/09/2026", "estatus": "REPORTE INCOMPLETO", "unidad": "HGZ#14", "obs": "SE REPORTA LA PERDIDA DE INFANTE EN EL HGZ14 ACTIVANDO EL CODIGO ROSA A LAS 19 05 ENCONTARNDOLA MINUTOS MAS TARDE EN EL LOBBY DE LA UNIDAD ENTREGANDOSELA A SU MADRE DE LA MENOR", "sla": ""}, {"folio": 4397, "ooad": "IMSS CENTRALES", "incidencia": "SOLICITUD DE INFORMACION COMPLETA", "hora": "20:18", "fecha": "17/09/2026", "estatus": "REPORTE INCOMPLETO", "unidad": "CECOE", "obs": "", "sla": "SOLICITA INFORMACION CONCRETA SOBRE EL CODIGO ROSA Y CUESTIONANDO NUEVA MENTE EL PORQUE NO SE INFORMA EN TIEMPO Y FORMA LOS REPORTES RELEVANTES"}], "hitos": [{"folio": 4380, "ooad": "SINALOA", "incidencia": "INGRESO DE DERECHOHABIENTES", "hora": "12:38", "fecha": "17/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "SUB DELAGACION", "municipio": "MOCHIS SINALOA", "obs": "SE REPORTA EN ARRIBO DE VARIOS DERECHOHABIENTES REALIZANDO FILAS PAR EL INGRESO A LA DELEGACION DEL IMSS"}, {"folio": 4394, "ooad": "SAN LUIS POTOSÍ", "incidencia": "AGRESION VERBAL A GUIARDIA", "hora": "10:31", "fecha": "17/09/2026", "estatus": "FUERA DE TIEMPO", "unidad": "UMF#4", "municipio": "SAN LUIS POTOSI", "obs": "REPORTA COORDINADOR EL PERCANSE SE TUVO DE GUARDIA DE SEGURIDAD Y DERECHOHABIENTE MANIFESTANDO QUE EL DERECHOHABIENTE LE ESCUPE EN LA CARA Y DESUES A LOS GOLPES MINUTOS MAS TARDE SE DIRIJE EL SUPERVISOR Y ADMINISTRADOR D"}, {"folio": 4396, "ooad": "SONORA", "incidencia": "CODIGO ROSA", "hora": "18:48", "fecha": "17/09/2026", "estatus": "REPORTE INCOMPLETO", "unidad": "HGZ#14", "municipio": "HERMOSILLO", "obs": "SE REPORTA LA PERDIDA DE INFANTE EN EL HGZ14 ACTIVANDO EL CODIGO ROSA A LAS 19 05 ENCONTARNDOLA MINUTOS MAS TARDE EN EL LOBBY DE LA UNIDAD ENTREGANDOSELA A SU MADRE DE LA MENOR"}, {"folio": 4397, "ooad": "IMSS CENTRALES", "incidencia": "SOLICITUD DE INFORMACION COMPLETA", "hora": "20:18", "fecha": "17/09/2026", "estatus": "REPORTE INCOMPLETO", "unidad": "CECOE", "municipio": "", "obs": ""}, {"folio": 4398, "ooad": "IMSS CENTRALES", "incidencia": "SOLICITUD DE RESGUARDO", "hora": "21:27", "fecha": "17/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "CECOE", "municipio": "", "obs": ""}, {"folio": 4399, "ooad": "SINALOA", "incidencia": "DETENCION DE PERSONA", "hora": "17:05", "fecha": "17/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "HGR#1", "municipio": "CULIACAN", "obs": "SE DETIENE A PERSONA POR ROBO DE PERTENENCIAS A LOS FAMILIARES DE LA UNIDAD MEDICA PONIENDOLA A DISPOSICION DE PROTECION FEDERAL"}, {"folio": 4401, "ooad": "SONORA", "incidencia": "INTENTO DE ESCAPE DE PACIENTE", "hora": "20:10", "fecha": "17/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "HGP", "municipio": "HERMOSILLO", "obs": "SE REPORTA EL INTETNO DE FUGA DE PACIENTE MENOR DE EDAD DEL HOSPITAL PEDIATRICO DETENIENDOLO EN EL AREA DE ESCALERAS Y SE PROCEDIO A CERRAR PUERTAS DE ACCESOS Y Y SALIDAS TRANQUILIZANDOLO Y POSTERIOR SE PROCEDE A TRASLAD"}, {"folio": 4413, "ooad": "IMSS CENTRALES", "incidencia": "ORDEN DEL DIA", "hora": "04:48", "fecha": "18/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "CECOE", "municipio": "", "obs": ""}, {"folio": 4429, "ooad": "JALISCO", "incidencia": "INTENTO DE INGRESO", "hora": "03:36", "fecha": "18/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "HGZ#89", "municipio": "GUADALAJARA", "obs": "INTENTA FEMENINA INGRESAR AL 5 PISO DEL AREA DE CUNEROS REFIRIENDO IR A VISATRA A FAMILIAR HOSPITALIZADO AL NO SER POSIBLE SU INGRESO SE RETIRA APRESURADA A RETIRARSE EN VEHICULO CAMIONETA JEEP REPORTANDO DE INMEDIATO A "}, {"folio": 4430, "ooad": "IMSS CENTRALES", "incidencia": "NOTA INFORMATIVA", "hora": "09:20", "fecha": "18/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "CECOE", "municipio": "", "obs": "MINUTOS MAS TARDE SOLICITA QUE SE TENGA UN CONTROL DE ACCESOS SOLICTANDO CARNETS PASES DE VISITA Y CREDENCIALES INSTITUCIONALES A LA VISTA PARA MEJOR CONTROL DE ACCESOS"}, {"folio": 4431, "ooad": "BAJA CALIFORNIA", "incidencia": "SE IMPARTE CURSOS DEL BUEN TRATO", "hora": "09:36", "fecha": "18/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "", "municipio": "", "obs": "SE IMPARTE CURSO DEL BUEN TRATO Y SE ANEXAN FOTOGRAFIAS DE ELLOS DANDO LA CANTIDAD DE PERSONAL QUE TOMO DICHO CURSO"}, {"folio": 4432, "ooad": "SINALOA", "incidencia": "SIMULACRO DE SISMO", "hora": "08:30", "fecha": "18/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "HGR#1", "municipio": "CULIACAN", "obs": "SE INICIA CURSO DE SIMULACRO DE SISMOS REPORTANDO SIN NINGUNA NOVEDAD O RELEVANCIA AL MOMENTO"}, {"folio": 4433, "ooad": "SONORA", "incidencia": "SIMULACRO DE SISMO", "hora": "10:34", "fecha": "18/09/2026", "estatus": "REPORTADO COMPLETO", "unidad": "HGZ#8", "municipio": "CABORCA", "obs": "SE INICIA CURSO DE SIMULACRO DE SISMOS REPORTANDO SIN NINGUNA NOVEDAD O RELEVANCIA AL MOMENTO"}], "sv_rows": [{"folio": 4402, "estado": "SONORA", "unidad": "UMF#4", "municipio": "SONORA", "hora": "22:25", "fecha": "17/09/2026"}, {"folio": 4403, "estado": "SINALOA", "unidad": "UMF#9", "municipio": "RUIZ CORTINEZ SINALOA", "hora": "22:53", "fecha": "17/09/2026"}, {"folio": 4404, "estado": "AGUASCALIENTES", "unidad": "SEDE DELEGACIONAL", "municipio": "AGUASCALIENTES", "hora": "23:25", "fecha": "17/09/2026"}, {"folio": 4405, "estado": "BAJA CALIFORNIA SUR", "unidad": "UMF#35", "municipio": "BAJA CALIFORNIA SUR", "hora": "23:45", "fecha": "17/09/2026"}, {"folio": 4406, "estado": "TAMAULIPAS", "unidad": "HRB#03", "municipio": "SAN CARLOS", "hora": "00:09", "fecha": "18/09/2026"}, {"folio": 4407, "estado": "SAN LUIS POTOSÍ", "unidad": "HGZ#50", "municipio": "SAN LUIS POTOSI", "hora": "00:23", "fecha": "18/09/2026"}, {"folio": 4408, "estado": "DURANGO", "unidad": "UMF#45", "municipio": "DURANGO", "hora": "00:53", "fecha": "18/09/2026"}, {"folio": 4409, "estado": "JALISCO", "unidad": "UMF#71", "municipio": "AYUTLA JALISCO", "hora": "01:38", "fecha": "18/09/2026"}, {"folio": 4410, "estado": "CHIHUAHUA", "unidad": "SUBDELAGACION", "municipio": "CHIHUAHUA", "hora": "02:00", "fecha": "18/09/2026"}, {"folio": 4411, "estado": "ZACATECAS", "unidad": "HR#51", "municipio": "VILLANUEVA", "hora": "03:25", "fecha": "18/09/2026"}, {"folio": 4412, "estado": "NAYARIT", "unidad": "HGZ#10", "municipio": "NAYARIT", "hora": "03:52", "fecha": "18/09/2026"}], "sv_reg": {"n": 11, "r": 0.9813, "b1": 31.44, "mean_gap": 32.7, "min_gap": 14, "max_gap": 85, "gaps": [28, 32, 20, 24, 14, 30, 45, 22, 85, 27]}, "errores": ["Folio 4400 (MONITOREO): fecha capturada como \"17/0972026\" (corrupta). Debe ser 17/09/2026.", "Folio 4394 SLP · AGRESION VERBAL: ESTATUS FUERA DE TIEMPO (10:31). Incidente reportado tarde; CECOE solicita información.", "Folio 4396 SONORA · CODIGO ROSA: REPORTE INCOMPLETO. Pérdida de infante en HGZ#14; recuperado en lobby. CECOE cuestiona demora (folio 4397).", "Folio 4397 IMSS CENTRALES: REPORTE INCOMPLETO — solicitud de información concreta sobre Código Rosa y por qué no se informa en tiempo y forma.", "Nuevo León vespertino 17/09 a las 19:24 y SLP vespertino a las 19:31 (tardíos pero marcados REPORTADO COMPLETO).", "Coordinador SLP cambió a LUCIA RAPETA QUIRINO (antes ADRIAN LEYVA).", "SLA vacío en la mayoría de filas; solo algunos incidentes CECOE tienen nota en SLA.", "Cobertura SV 11/14: faltan Baja California, Coahuila y Nuevo León.", "BCS/Sonora/Sinaloa/BC matutinos con nota de “hora de diferencia por horario de zona” (05:00–05:36).", "Sinaloa reporta 4 códigos plata en permanencia (vespertino 17 y matutino 18)."], "missing_sv": ["BAJA CALIFORNIA", "COAHUILA", "NUEVO LEÓN"]};
+</script>
+<script>
+const m = DASH.meta;
+document.getElementById('kpiGrid').innerHTML = [
+  {label:'Registros totales', val:m.total, foot:`${m.mat} mat · ${m.ves} ves · ${m.sv} SV`, cls:'accent-teal'},
+  {label:'Reportado completo', val:m.completo, foot:`${m.fuera} FT · ${m.incomp} incompletos`, cls:'accent-green'},
+  {label:'Fuera de tiempo', val:m.fuera, foot:'SLP agresión verbal', cls:m.fuera?'accent-red':'accent-green'},
+  {label:'Reportes incompletos', val:m.incomp, foot:'Código Rosa + CECOE', cls:m.incomp?'accent-amber':'accent-green'},
+  {label:'SV ejecutadas', val:m.sv, foot:`${m.sv_miss} OOAD sin SV`, cls:'accent-amber'},
+  {label:'OOAD con desviación', val:m.ooad_dev, foot:'SLP · Sonora', cls:m.ooad_dev?'accent-red':'accent-green'},
+].map(k=>`<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="num">${k.val}</div><div class="foot">${k.foot}</div></div>`).join('');
+
+// Timeline
+const axis = document.getElementById('timelineAxis');
+const minStart=300, minEnd=450;
+let hourMarks='';
+for(let h=5;h<=7;h++){ const pct=((h*60)-minStart)/(minEnd-minStart)*100; hourMarks+=`<div class="hm" style="left:${pct}%">${String(h).padStart(2,'0')}:00</div>`; }
+axis.innerHTML=`<div class="timeline-line"></div><div class="timeline-hourmarks">${hourMarks}</div>`;
+DASH.mat_pts.forEach(p=>{
+  const pct=Math.min(100,Math.max(0,(p.minutos-minStart)/(minEnd-minStart)*100));
+  const el=document.createElement('div'); el.className='tpoint ok'; el.style.left=pct+'%';
+  el.innerHTML=`<div class="tip">${p.ooad} · ${p.hora}</div>`; axis.appendChild(el);
+});
+
+// OOAD table - deviations first
+const sorted=[...DASH.ooad].sort((a,b)=>{
+  const wa=a.estatus_rep==='DESVIACIÓN'?0:(a.estatus_sv==='SIN SV'?1:2);
+  const wb=b.estatus_rep==='DESVIACIÓN'?0:(b.estatus_sv==='SIN SV'?1:2);
+  return wa-wb || a.ooad.localeCompare(b.ooad);
+});
+document.getElementById('ooadBody').innerHTML = sorted.map(r=>{
+  const bRep = r.estatus_rep==='OK' ? '<span class="badge ok"><span class="badge-dot"></span>OK</span>'
+    : '<span class="badge miss"><span class="badge-dot"></span>'+r.estatus_rep+'</span>';
+  const bSv = r.estatus_sv==='OK' ? '<span class="badge ok"><span class="badge-dot"></span>Con SV</span>'
+    : '<span class="badge miss"><span class="badge-dot"></span>Sin SV</span>';
+  return `<tr>
+    <td style="font-family:var(--display);font-weight:600">${r.ooad}</td>
+    <td class="muted">${r.coord||'—'}</td>
+    <td class="num">${r.mat}</td><td class="num">${r.ves}</td>
+    <td style="font-family:var(--mono)">${r.hora_mat}</td>
+    <td class="num" style="color:${r.ft?'var(--red)':'var(--dim)'}">${r.ft}</td>
+    <td class="num" style="color:${r.incomp?'var(--amber)':'var(--dim)'}">${r.incomp}</td>
+    <td>${bRep}</td>
+    <td class="num" style="color:${r.sv?'var(--green)':'var(--red)'}">${r.sv}</td>
+    <td class="muted">${r.sv_unidad}</td>
+    <td style="font-family:var(--mono)" class="muted">${r.sv_hora}</td>
+    <td>${bSv}</td>
+  </tr>`;
+}).join('');
+
+// Deviations
+document.getElementById('devList').innerHTML = DASH.devs.length ? DASH.devs.map(d=>`
+  <div class="dev-item">
+    <div class="row1"><span class="title">${d.incidencia}</span><span class="meta">${d.hora} · ${d.estatus}</span></div>
+    <div class="loc">${d.ooad}${d.unidad?' · '+d.unidad:''} · Folio ${d.folio}</div>
+    ${d.obs?`<div class="note">${d.obs}</div>`:''}
+    ${d.sla?`<div class="note" style="margin-top:4px;color:var(--amber)">SLA: ${d.sla}</div>`:''}
+  </div>`).join('') : '<div class="empty-box">Sin desviaciones</div>';
+
+document.getElementById('missList').innerHTML = DASH.missing_sv.map(o=>`<div class="miss-item">${o}</div>`).join('');
+
+// Hitos - limit display of less critical
+document.getElementById('hitoList').innerHTML = DASH.hitos.map(h=>`
+  <div class="hito-item">
+    <div class="row1"><span class="title">${h.incidencia}</span><span class="meta">${h.hora} · ${(h.fecha||'').slice(0,5)}</span></div>
+    <div class="loc">${h.ooad}${h.unidad?' · '+h.unidad:''}${h.municipio?' · '+h.municipio:''} · Folio ${h.folio}</div>
+    ${h.obs?`<div class="note">${h.obs}</div>`:''}
+  </div>`).join('');
+
+// SV
+const first=DASH.sv_rows[0], last=DASH.sv_rows[DASH.sv_rows.length-1];
+document.getElementById('svHitos').innerHTML = `
+  <div style="margin-bottom:6px"><b>Inicio:</b> ${first.estado} · ${first.unidad} · ${first.hora} (${first.fecha})</div>
+  <div style="margin-bottom:6px"><b>Cierre:</b> ${last.estado} · ${last.unidad} · ${last.hora} (${last.fecha})</div>
+  <div><b>Resultado:</b> 11/11 REPORTADO COMPLETO</div>`;
+document.getElementById('svList').innerHTML = DASH.sv_rows.map(s=>
+  `<div class="sv-item"><span><span class="u">${s.estado}</span> · ${s.unidad||'—'}</span><span style="font-family:var(--mono);color:var(--dim)">${s.hora}</span></div>`
+).join('');
+
+// Reg A
+const matMin = DASH.mat_pts.map(p=>p.minutos);
+document.getElementById('regMatStats').innerHTML = `
+  <div class="stat-box"><div class="k">Casos FT mat</div><div class="v" style="color:var(--green)">0</div></div>
+  <div class="stat-box"><div class="k">N muestras</div><div class="v">${DASH.mat_pts.length}</div></div>
+  <div class="stat-box"><div class="k">Más temprano</div><div class="v">05:00</div></div>
+  <div class="stat-box"><div class="k">Más tardío</div><div class="v">06:49</div></div>`;
+document.getElementById('regMatNotes').innerHTML = `
+  <li>Regresión logística de retraso <b>no estimable</b> en cierres matutinos: 0 casos FT.</li>
+  <li>El único FT del día es un <b>incidente</b> (SLP agresión 10:31), no un cierre de turno.</li>
+  <li>Cierres matutinos entre BCS 05:00 y Chihuahua 06:49.</li>
+  <li>Hay 1 FT + 2 incompletos en incidentes (Código Rosa Sonora + CECOE).</li>`;
+
+const curveH=[]; for(let mi=300;mi<=450;mi+=5) curveH.push(`${String(Math.floor(mi/60)).padStart(2,'0')}:${String(mi%60).padStart(2,'0')}`);
+new Chart(document.getElementById('regMat'),{
+  type:'line',
+  data:{labels:curveH, datasets:[
+    {label:'Prob. FT cierres (≈0)', data:curveH.map(()=>0), borderColor:'#2AC9B8', backgroundColor:'rgba(42,201,184,0.10)', fill:true, tension:0.25, pointRadius:0, borderWidth:2},
+    {label:'Observados', data:curveH.map(h=>{const [hh,mm]=h.split(':').map(Number); const min=hh*60+mm; return DASH.mat_pts.some(p=>Math.abs(p.minutos-min)<3)?0:null}),
+      borderColor:'transparent',
+      pointBackgroundColor:curveH.map(h=>{const [hh,mm]=h.split(':').map(Number); const min=hh*60+mm; return DASH.mat_pts.some(p=>Math.abs(p.minutos-min)<3)?'#33C077':'transparent'}),
+      pointRadius:curveH.map(h=>{const [hh,mm]=h.split(':').map(Number); const min=hh*60+mm; return DASH.mat_pts.some(p=>Math.abs(p.minutos-min)<3)?5:0}),
+      showLine:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#8AA0C2',font:{family:'Inter',size:11}}}},
+    scales:{x:{ticks:{color:'#566A8E',maxTicksLimit:7,font:{family:'IBM Plex Mono',size:10}},grid:{color:'#16233B'}},
+      y:{ticks:{color:'#566A8E',callback:v=>v+'%',font:{family:'IBM Plex Mono',size:10}},grid:{color:'#16233B'},min:0,max:100}}
+  }
+});
+
+// Reg B SV
+const reg=DASH.sv_reg;
+document.getElementById('regSvStats').innerHTML=`
+  <div class="stat-box"><div class="k">Correlación (r)</div><div class="v">${reg.r}</div></div>
+  <div class="stat-box"><div class="k">Intervalo medio</div><div class="v">${reg.mean_gap} min</div></div>
+  <div class="stat-box"><div class="k">Gap mín / máx</div><div class="v">${reg.min_gap} / ${reg.max_gap}</div></div>
+  <div class="stat-box"><div class="k">Pendiente ≈</div><div class="v">${reg.b1} min</div></div>`;
+document.getElementById('regSvNotes').innerHTML=`
+  <li>Ritmo de llamadas muy constante (r=${reg.r}).</li>
+  <li>Gap máximo ${reg.max_gap} min (Chihuahua → Zacatecas).</li>
+  <li>Faltan SV: Baja California, Coahuila, Nuevo León.</li>`;
+
+let acc=0; const cum=[0];
+reg.gaps.forEach(g=>{acc+=g; cum.push(acc)});
+new Chart(document.getElementById('regSv'),{
+  type:'line',
+  data:{labels:DASH.sv_rows.map((r,i)=>`${i+1}. ${r.estado.slice(0,8)}`),
+    datasets:[{label:'Minutos desde 1ª SV', data:cum, borderColor:'#2AC9B8', backgroundColor:'rgba(42,201,184,0.10)', fill:true, tension:0.2, pointRadius:4, pointBackgroundColor:'#2AC9B8', borderWidth:2}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#8AA0C2',font:{family:'Inter',size:11}}}},
+    scales:{x:{ticks:{color:'#566A8E',font:{family:'IBM Plex Mono',size:9},maxRotation:45},grid:{color:'#16233B'}},
+      y:{ticks:{color:'#566A8E',font:{family:'IBM Plex Mono',size:10},callback:v=>v+' min'},grid:{color:'#16233B'}}}
+  }
+});
+
+document.getElementById('errList').innerHTML = DASH.errores.map(e=>
+  `<div class="err-item"><span class="err-icon">▲</span><span>${e}</span></div>`).join('');
+</script>
+</body>
+</html>
